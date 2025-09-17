@@ -8,52 +8,82 @@ function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/campaigns", { withCredentials: true })
+      .get("/api/campaigns")
       .then((res) => setCampaigns(res.data))
       .catch((err) => console.error(err));
   }, []);
 
   const getSuggestions = async () => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/ai/suggest-messages",
-        { objective },
-        { withCredentials: true }
-      );
-      setSuggestions(res.data.suggestions);
+      const res = await axios.post("/api/ai/suggest-messages", { objective });
+      setSuggestions(res.data.suggestions || []);
     } catch (err) {
-      console.error(err);
-      alert("Failed to fetch AI suggestions");
+      console.error("AI fetch error:", err.response?.data || err.message);
+      alert("Failed to fetch AI suggestions — check server logs");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Dashboard</h2>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <h2 className="text-3xl font-bold mb-6">Dashboard</h2>
 
-      <h3>Past Campaigns</h3>
-      <ul>
-        {campaigns.map((c) => (
-          <li key={c._id}>
-            <b>{c.name}</b> — Audience: {c.audienceSize}
-          </li>
-        ))}
-      </ul>
+      {/* Recent Campaigns */}
+      <section className="mb-8">
+        <h3 className="text-xl font-semibold mb-4">Recent Campaigns</h3>
 
-      <h3>AI Message Suggestions</h3>
-      <input
-        type="text"
-        placeholder="Enter campaign objective"
-        value={objective}
-        onChange={(e) => setObjective(e.target.value)}
-      />
-      <button onClick={getSuggestions}>Get Suggestions</button>
+        {campaigns.length === 0 ? (
+          <p className="text-gray-500 italic">
+            No campaigns created yet. Start by creating one in the Campaigns section.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {campaigns.map((c) => (
+              <div key={c._id} className="bg-white p-4 rounded shadow">
+                <div className="flex justify-between">
+                  <div>
+                    <h4 className="font-bold">{c.name}</h4>
+                    <p className="text-sm text-gray-600">
+                      Audience: {c.audienceSize}
+                    </p>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {new Date(c.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
-      <ul>
-        {suggestions.map((s, idx) => (
-          <li key={idx}>{s}</li>
-        ))}
-      </ul>
+      {/* AI Suggestions */}
+      <section className="bg-white p-6 rounded shadow">
+        <h3 className="text-xl font-semibold mb-4">AI Message Suggestions</h3>
+        <div className="flex gap-3 mb-4">
+          <input
+            value={objective}
+            onChange={(e) => setObjective(e.target.value)}
+            placeholder="e.g. Bring back inactive users"
+            className="flex-1 border rounded px-3 py-2"
+          />
+          <button
+            onClick={getSuggestions}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Get
+          </button>
+        </div>
+
+        {suggestions.length > 0 && (
+          <ul className="list-disc ml-5">
+            {suggestions.map((s, i) => (
+              <li key={i} className="py-1">
+                {s}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

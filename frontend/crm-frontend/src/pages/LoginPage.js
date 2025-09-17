@@ -19,10 +19,17 @@ function LoginPage() {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Welcome to Xeno CRM</h2>
-      {message && <p style={{ color: "red" }}>{message}</p>}
-      <button onClick={handleLogin}>Login</button>
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-96 text-center">
+        <h2 className="text-2xl font-bold mb-6">Login to Xeno CRM</h2>
+        {message && <p className="text-red-500 mb-4">{message}</p>}
+        <button
+          onClick={handleLogin}
+          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition w-full"
+        >
+          Login with Google
+        </button>
+      </div>
     </div>
   );
 }

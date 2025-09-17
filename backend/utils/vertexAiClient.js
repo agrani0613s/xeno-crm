@@ -3,31 +3,58 @@ import { VertexAI } from "@google-cloud/vertexai";
 
 dotenv.config();
 
-const vertexAI = new VertexAI({
-  project: process.env.GOOGLE_CLIENT_ID,
-  location: "us-central1", // most common region
-});
+let model = null;
 
-const model = vertexAI.preview.getGenerativeModel({
-  model: "gemini-pro", // Vertex AI’s text model
-});
+// Only set up real Vertex AI client if not in mock mode
+if (process.env.MOCK_AI !== "true") {
+  const vertexAI = new VertexAI({
+    project: process.env.GOOGLE_PROJECT_ID,
+    location: "us-central1",
+    googleAuthOptions: {
+      keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    },
+  });
 
-// Suggest campaign messages
+  model = vertexAI.preview.getGenerativeModel({
+    model: "gemini-pro",
+  });
+}
+
+// ✅ Suggest campaign messages
 export async function suggestMessages(objective) {
+  // Always use mock when MOCK_AI is true
+  if (process.env.MOCK_AI === "true" || !model) {
+    return [
+      `Reminder: Don’t forget about ${objective}!`,
+      `Exclusive offer related to ${objective} just for you.`,
+      `We noticed your interest in ${objective} — here’s a deal.`,
+    ];
+  }
+
   try {
     const prompt = `Suggest 3 short personalized campaign messages for this objective: "${objective}"`;
     const resp = await model.generateContent(prompt);
 
-    // Extract text from response
-    return resp.response.candidates.map(c => c.content.parts[0].text);
+    return resp.response?.candidates?.map(c => c.content.parts[0].text) || [];
   } catch (err) {
     console.error("❌ Vertex AI error:", err.message);
-    return ["[AI suggestion failed]"];
+
+    // Fallback gracefully to mock responses
+    return [
+      `[AI unavailable, mock suggestion] Reminder about ${objective}`,
+      `[AI unavailable, mock suggestion] Special offer: ${objective}`,
+      `[AI unavailable, mock suggestion] Explore ${objective} with us!`,
+    ];
   }
 }
 
-// Parse natural language into Mongo query
+// ✅ Parse natural language into Mongo query
 export async function parseSegmentRule(description) {
+  if (process.env.MOCK_AI === "true" || !model) {
+    // Return a fake rule in mock mode
+    return { spend: { $gt: 1000 }, visits: { $lt: 5 } };
+  }
+
   const prompt = `
   Convert this description into a MongoDB query filter (JSON only, no explanation):
   "${description}"
@@ -43,7 +70,8 @@ export async function parseSegmentRule(description) {
     return JSON.parse(text);
   } catch (err) {
     console.error("❌ Vertex AI parse error:", err.message);
+
+    // Safe fallback
     return {};
   }
 }
-

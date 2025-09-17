@@ -47,10 +47,16 @@ router.get("/failure", (req, res) => {
   res.send("❌ Google login failed");
 });
 
+// routes/authRoutes.js
 router.get("/logout", (req, res, next) => {
-  req.logout((err) => {
+  req.logout(function(err) {
     if (err) return next(err);
-    res.redirect("http://localhost:3000");
+    // destroy session and clear cookie
+    req.session.destroy((err2) => {
+      res.clearCookie("connect.sid", { path: "/" });
+      // browser redirect to frontend login page
+      return res.redirect((process.env.FRONTEND_URL || "http://localhost:3000") + "/login?message=Logged out");
+    });
   });
 });
 

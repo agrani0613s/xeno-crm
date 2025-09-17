@@ -31,41 +31,76 @@ function CampaignPage() {
         { withCredentials: true }
       );
 
-      alert("Campaign created!");
+      alert("✅ Campaign created!");
       setCampaigns([res.data.campaign, ...campaigns]);
+      setName("");
+      setRules([]);
     } catch (err) {
       console.error(err);
-      alert("Failed to create campaign");
+      alert("❌ Failed to create campaign");
     }
   };
 
   if (!user) {
-    return <p style={{ textAlign: "center" }}>⚠️ Please log in to access campaigns.</p>;
+    return (
+      <p className="text-center text-red-500 mt-10">
+        ⚠️ Please log in to access campaigns.
+      </p>
+    );
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Campaigns</h2>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <h2 className="text-3xl font-bold mb-6 text-gray-800">🎯 Campaigns</h2>
 
-      <h3>Create Campaign</h3>
-      <input
-        type="text"
-        placeholder="Campaign name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <SegmentBuilder onChange={setRules} />
-      <button onClick={createCampaign}>Create</button>
+      {/* Create Campaign */}
+      <div className="bg-white p-6 rounded shadow mb-10">
+        <h3 className="text-xl font-semibold mb-4">Create New Campaign</h3>
+        <input
+          type="text"
+          placeholder="Campaign name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="border border-gray-300 rounded px-3 py-2 w-full mb-4 focus:ring-2 focus:ring-blue-400"
+        />
+        <SegmentBuilder onChange={setRules} />
 
-      <h3>Campaign History</h3>
-      <ul>
-        {campaigns.map((c) => (
-          <li key={c._id}>
-            <b>{c.name}</b> — Audience: {c.audienceSize} —{" "}
-            <Link to={`/campaigns/${c._id}/logs`}>View Logs</Link>
-          </li>
-        ))}
-      </ul>
+<button
+  onClick={createCampaign}
+  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition mt-4"
+>
+  ➕ Create Campaign
+</button>
+
+      </div>
+
+      {/* Campaign History */}
+      <h3 className="text-xl font-semibold mb-4">Past Campaigns</h3>
+      {campaigns.length === 0 ? (
+        <p className="text-gray-500">No campaigns created yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {campaigns.map((c) => (
+            <div
+              key={c._id}
+              className="bg-white border rounded p-4 flex justify-between items-center shadow-sm"
+            >
+              <div>
+                <h4 className="font-bold text-lg">{c.name}</h4>
+                <p className="text-sm text-gray-600">
+                  Audience: {c.audienceSize}
+                </p>
+              </div>
+              <Link
+                to={`/campaigns/${c._id}/logs`}
+                className="text-blue-500 hover:underline"
+              >
+                View Logs
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

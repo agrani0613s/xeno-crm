@@ -19,3 +19,6 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+axios.defaults.withCredentials = true; // <-- send cookies on every request

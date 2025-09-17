@@ -1,65 +1,36 @@
 import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
 
 function NavBar() {
-  const { user, setUser } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
-  const handleLogout = async () => {
-    try {
-      await axios.get("http://localhost:5000/auth/logout", { withCredentials: true });
-      setUser(null);
-      navigate("/login?message=Logged out successfully");
-    } catch (err) {
-      console.error("Logout failed", err);
-    }
-  };
+  const handleLogout = () => {
+  // Using a browser redirect ensures the backend clears the session cookie and then redirects to frontend
+  window.location.href = `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/auth/logout`;
+};
 
   return (
-    <nav
-      style={{
-        padding: "10px 20px",
-        backgroundColor: "#282c34",
-        color: "white",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <div>
-        <Link to="/" style={{ color: "white", marginRight: "15px", textDecoration: "none" }}>
-          Home
-        </Link>
+    <nav className="bg-gray-900 text-white px-6 py-9 flex justify-between items-center">
+      <div className="flex items-center space-x-6">
+        <Link to="/" className="font-bold text-lg hover:text-blue-300">Xeno CRM</Link>
+        <Link to="/" className="hover:text-gray-300">Home</Link>
         {user && (
           <>
-            <Link
-              to="/dashboard"
-              style={{ color: "white", marginRight: "15px", textDecoration: "none" }}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/campaigns"
-              style={{ color: "white", marginRight: "15px", textDecoration: "none" }}
-            >
-              Campaigns
-            </Link>
+            <Link to="/dashboard" className="hover:text-gray-300">Dashboard</Link>
+            <Link to="/campaigns" className="hover:text-gray-300">Campaigns</Link>
           </>
         )}
       </div>
 
       <div>
         {user ? (
-          <>
-            <span style={{ marginRight: "15px" }}>Hi, {user.displayName}</span>
-            <button onClick={handleLogout}>Logout</button>
-          </>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm">Hi, {user.displayName}</span>
+            <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">Logout</button>
+          </div>
         ) : (
-          <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
-            Login
-          </Link>
+          <Link to="/login" className="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">Login</Link>
         )}
       </div>
     </nav>
