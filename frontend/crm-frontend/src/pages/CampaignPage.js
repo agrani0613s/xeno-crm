@@ -12,7 +12,8 @@ function CampaignPage() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/campaigns", { withCredentials: true })
+      // .get("http://localhost:5000/api/campaigns", { withCredentials: true })
+      .get(`${process.env.REACT_APP_API_URL}/api/campaigns`, { withCredentials: true })
       .then((res) => setCampaigns(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -25,11 +26,17 @@ function CampaignPage() {
         query[rule.field] = { [rule.operator]: Number(rule.value) };
       });
 
+      // const res = await axios.post(
+      //   "http://localhost:5000/api/campaigns",
+      //   { name, rules: query },
+      //   { withCredentials: true }
+      // );
+
       const res = await axios.post(
-        "http://localhost:5000/api/campaigns",
-        { name, rules: query },
-        { withCredentials: true }
-      );
+     `${process.env.REACT_APP_API_URL}/api/campaigns`,
+     { name, rules: query },
+     { withCredentials: true }
+    );
 
       alert("✅ Campaign created!");
       setCampaigns([res.data.campaign, ...campaigns]);

@@ -8,7 +8,8 @@ function CampaignLogsPage() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/campaigns/${id}/logs`, { withCredentials: true })
+      // .get(`http://localhost:5000/api/campaigns/${id}/logs`, { withCredentials: true })
+      .get(`${process.env.REACT_APP_API_URL}/api/campaigns/${id}/logs`, { withCredentials: true })
       .then((res) => setLogs(res.data))
       .catch((err) => console.error(err));
   }, [id]);

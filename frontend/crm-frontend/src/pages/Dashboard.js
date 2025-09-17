@@ -8,14 +8,19 @@ function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("/api/campaigns")
+      // .get("/api/campaigns")
+      .get(`${process.env.REACT_APP_API_URL}/api/campaigns`, { withCredentials: true })
       .then((res) => setCampaigns(res.data))
       .catch((err) => console.error(err));
   }, []);
 
   const getSuggestions = async () => {
     try {
-      const res = await axios.post("/api/ai/suggest-messages", { objective });
+      // const res = await axios.post("/api/ai/suggest-messages", { objective });
+      const res = await axios.post(
+     `${process.env.REACT_APP_API_URL}/api/ai/suggest-messages`,
+       { objective },
+       { withCredentials: true });
       setSuggestions(res.data.suggestions || []);
     } catch (err) {
       console.error("AI fetch error:", err.response?.data || err.message);

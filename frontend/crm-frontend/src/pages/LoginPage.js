@@ -15,7 +15,8 @@ function LoginPage() {
   }, [user, navigate]);
 
   const handleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google";
+    // window.location.href = "http://localhost:5000/auth/google";
+    window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
   };
 
   return (
