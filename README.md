@@ -37,9 +37,11 @@ cd crm-frontend
 npm install
 npm start
 
+# Xeno-CRM Architecture Diagram
 
-### Architectural Diagram
-```
+Below is a high-level architectural overview of the `xeno-crm` repository:
+
+```mermaid
 +-------------------+
 |                   |
 |   React Frontend  |    (frontend/crm-frontend)
@@ -63,7 +65,6 @@ npm start
 | (Gemini-Pro Model)  |
 +---------------------+
 ```
-
 ## Components
 
 ### 1. Frontend (React)
